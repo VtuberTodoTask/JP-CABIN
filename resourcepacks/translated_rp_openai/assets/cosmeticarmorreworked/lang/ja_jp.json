@@ -1,0 +1,7 @@
+{
+  "cos.key.opencosarmorinventory": "OpenCosmeticArmorInventory",
+  "cos.gui.buttoncos": "コスメティックアーマー",
+  "cos.gui.buttonnormal": "通常",
+  "cos.command.clearcosarmor.success.single": "プレイヤー %s のコスメティックアーマーインベントリから %s アイテムを削除しました",
+  "cos.command.clearcosarmor.success.multiple": "%s プレイヤーのコスメティックアーマーインベントリから %s アイテムを削除しました"
+}

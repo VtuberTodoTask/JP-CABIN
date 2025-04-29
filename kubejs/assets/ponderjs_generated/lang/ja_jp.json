@@ -1,0 +1,10 @@
+{
+  "ponderjs.ponder.alchemy_setup.header": "アルケミカルレーザー",
+  "ponderjs.ponder.alchemy_setup.text_1": "インバー・マシンから始めよう",
+  "ponderjs.ponder.alchemy_setup.text_2": "好きな色のインダストリアル・ランプを取り付ける",
+  "ponderjs.ponder.alchemy_setup.text_3": "インバー・マシンをターゲットにデプロイヤーを置く",
+  "ponderjs.ponder.alchemy_setup.text_4": "レンチを使ってパンチモードにする",
+  "ponderjs.ponder.alchemy_setup.text_5": "デプロイヤーが起動するたびに...",
+  "ponderjs.ponder.alchemy_setup.text_6": "...レーザーランプは高エネルギービームを照射します。",
+  "ponderjs.ponder.alchemy_setup.text_7": "ビームに巻き込まれたホッパーマインカートは、その中にあるアイテムを処理します。"
+}

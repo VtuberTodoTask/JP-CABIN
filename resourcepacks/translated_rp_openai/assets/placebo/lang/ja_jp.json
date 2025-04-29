@@ -1,0 +1,8 @@
+{
+  "key.categories.placebo": "プラセボ",
+  "placebo.toggleTrails": "サポータートレイルの切り替え",
+  "placebo.toggleWings": "サポーターウィングの切り替え",
+  "placebo.cmd.serialize_success": "%sを%sに保存しました。",
+  "placebo.cmd.serialize_failure": "シリアル化プロセス中にエラーが発生しました。",
+  "placebo.cmd.not_found": "%sが見つかりませんでした。"
+}

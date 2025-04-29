@@ -1,0 +1,19 @@
+{
+  "itemGroup.cb_microblock": "CBマイクロブロック",
+  "item.cb_microblock.stone_saw": "石ののこぎり",
+  "item.cb_microblock.iron_saw": "鉄ののこぎり",
+  "item.cb_microblock.diamond_saw": "ダイヤモンドののこぎり",
+  "item.cb_microblock.stone_rod": "石の棒",
+  "item.cb_microblock.face.1": "%s カバー",
+  "item.cb_microblock.face.2": "%s パネル",
+  "item.cb_microblock.face.4": "%s スラブ",
+  "item.cb_microblock.hollow.1": "中空の %s カバー",
+  "item.cb_microblock.hollow.2": "中空の %s パネル",
+  "item.cb_microblock.hollow.4": "中空の %s スラブ",
+  "item.cb_microblock.edge.1": "%s ストリップ",
+  "item.cb_microblock.edge.2": "%s ポスト",
+  "item.cb_microblock.edge.4": "%s 柱",
+  "item.cb_microblock.corner.1": "%s ニッチ",
+  "item.cb_microblock.corner.2": "%s コーナー",
+  "item.cb_microblock.corner.4": "%s ノッチ"
+}

@@ -1,0 +1,9 @@
+{
+  "cull-less-leaves.title": "葉を少なくカリング",
+  "cull-less-leaves.option.enabled": "有効",
+  "cull-less-leaves.option.depth": "深さ",
+  "cull-less-leaves.option.depth.tooltip": "葉の内部がカリングされる前の葉の層の量。\n1 = 最も速いが見た目が最も良くない。\n2 = 推奨。\n4 = 最も遅いが見た目が最も良い。",
+  "cull-less-leaves.sodium.option.enabled": "葉をカリング",
+  "cull-less-leaves.sodium.option.enabled.description": "葉を少なくカリングモッドを有効にします。",
+  "cull-less-leaves.sodium.option.depth": "葉のカリング深さ"
+}

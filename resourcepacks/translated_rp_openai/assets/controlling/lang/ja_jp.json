@@ -1,0 +1,14 @@
+{
+  "options.showAll": "すべて表示",
+  "options.showConflicts": "競合を表示",
+  "options.showNone": "未バインドを表示",
+  "options.availableKeys": "利用可能なキー",
+  "options.sort": "ソート",
+  "options.category": "カテゴリ",
+  "options.key": "キー",
+  "options.sortNone": "なし",
+  "options.sortAZ": "A->Z",
+  "options.sortZA": "Z->A",
+  "options.toggleFree": "フリー切替",
+  "options.confirmReset": "確認しますか？"
+}

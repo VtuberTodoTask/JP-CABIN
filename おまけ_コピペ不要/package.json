@@ -1,0 +1,18 @@
+{
+  "name": "translator_minecraft_others",
+  "version": "1.0.0",
+  "main": "langTranslator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "deepl-node": "^1.17.3",
+    "dotenv": "^16.5.0",
+    "openai": "^4.96.0",
+    "p-limit": "^6.2.0"
+  }
+}

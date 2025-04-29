@@ -1,0 +1,22 @@
+{
+  "sdrp.logo": "パックロゴ",
+  "sdrp.mainmenu": "メインメニュー",
+  "sdrp.overworld.in": "オーバーワールドにいる",
+  "sdrp.overworld": "オーバーワールド",
+  "sdrp.the_nether.in": "ネザーにいる",
+  "sdrp.the_nether": "ネザー",
+  "sdrp.the_end.in": "エンドにいる",
+  "sdrp.the_end": "エンド",
+  "sdrp.compact_world.in": "コンパクトワールドにいる",
+  "sdrp.compact_world": "コンパクトワールド",
+  "sdrp.dungeon.in": "ダンジョンワールドにいる",
+  "sdrp.dungeon": "ダンジョンワールド",
+  "sdrp.spatial_storage.in": "空間ストレージにいる",
+  "sdrp.spatial_storage": "空間ストレージ",
+  "sdrp.otherside.in": "オザーサイドにいる",
+  "sdrp.otherside": "オザーサイド",
+  "sdrp.paradise_lost.in": "失われた楽園にいる",
+  "sdrp.paradise_lost": "失われた楽園",
+  "sdrp.mining": "マイニングディメンション",
+  "sdrp.mining.in": "マイニングディメンションにいる"
+}
