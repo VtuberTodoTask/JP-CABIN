@@ -1,0 +1,42 @@
+{
+  "name": "あなたの最初のロケット",
+  "icon": "ad_astra:nasa_workbench",
+  "sortnum": 3,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "NASA作業台",
+      "item": "ad_astra:nasa_workbench",
+      "text": "ロケットを作るには、まずすべての部品を集める必要があります：コーン、プレート、フィン、タンク、エンジン。その後、ロケット専用に設計されたNASA作業台でロケットを作ることができます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "NASA作業台",
+      "recipe": "ad_astra:nasa_workbench"
+    },
+    {
+      "type": "multiblock",
+      "multiblock": {
+        "pattern": [
+          [
+            "   ",
+            " 0 ",
+            "   "
+          ]
+        ],
+        "mapping": {
+          "0": "ad_astra:launch_pad"
+        },
+        "symmetrical": true
+      },
+      "text": "新しく作成したロケットを設置するには、発射台を作る必要があります。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "発射台",
+      "recipe": "ad_astra:launch_pad",
+      "text": "発射台が完成したら、ロケットを中央に置いてください。希望する場合は、燃料が入ったら自動的にロケットを発射するために、発射台の任意の部分に電力を供給することができます。"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "エネルギーを生成中",
+  "icon": "ad_astra:coal_generator",
+  "sortnum": 0,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "石炭発電機",
+      "item": "ad_astra:coal_generator",
+      "text": "エネルギーはAd Astraの主要な資源です。すべての機械で使用され、すべてに必要です。エネルギーを生成する方法はいくつかあり、最も基本的な方法は石炭発電機です。木材や石炭などの燃焼可能な資源を使用してエネルギーを生成します。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:coal_generator"
+    }
+  ]
+}

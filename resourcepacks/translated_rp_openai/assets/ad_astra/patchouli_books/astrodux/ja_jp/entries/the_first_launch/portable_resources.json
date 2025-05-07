@@ -1,0 +1,29 @@
+{
+  "name": "ポータブルリソース",
+  "icon": "ad_astra:gas_tank",
+  "sortnum": 6,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ガスタンク",
+      "item": "ad_astra:gas_tank",
+      "text": "酸素タンクは、便利なポータブル形式で酸素を保存することができます。名前に反して、任意の液体を保存することができます。右クリックを押し続けることで、酸素がインベントリ内のアイテムに分配され、アーマーに偏ります。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:gas_tank",
+      "recipe2": "ad_astra:large_gas_tank"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "エトリオニックキャパシタ",
+      "item": "ad_astra:etrionic_capacitor",
+      "text": "エトリオニックキャパシタは、ポータブル形式でエネルギーを保存するためのバッテリーのようなアイテムです。機械のエネルギースロットに配置して電力を供給することができ、ガスタンクと同様に、右クリックを押し続けることでインベントリに分配できます。2つのモードがあります：シーケンシャルとラウンドロビン。シーケンシャルはエネルギーを1つずつ分配し、ラウンドロビンはエネルギーを均等に分配します。モードは、しゃがみながら右クリックすることで変更できます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:etrionic_capacitor"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "産業用ランプ",
+  "icon": "ad_astra:lime_industrial_lamp",
+  "sortnum": 2,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "産業用ランプ",
+      "item": "ad_astra:small_blue_industrial_lamp",
+      "text": "産業用ランプは16色すべてで、小サイズと大サイズで利用可能です。デフォルトでは、これらはすべて通常の白い光を放ちます。ただし、$(l:https://modrinth.com/mod/shimmer!)Shimmer$(/l)を持っている場合、各ライトはそれぞれの色を放ちます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:magenta_industrial_lamp",
+      "recipe2": "ad_astra:small_red_industrial_lamp"
+    }
+  ]
+}

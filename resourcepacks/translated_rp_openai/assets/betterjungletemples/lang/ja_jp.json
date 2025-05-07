@@ -4,10 +4,10 @@
   "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples": "YUNGのより良いジャングル寺院",
   "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general": "一般",
   "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general.@Tooltip": "一般設定",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat": "モッド互換性",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.@Tooltip": "モッド互換性設定",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general.disableVanillaJungleTemples": "バニラのジャングル寺院を無効にする",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general.disableVanillaJungleTemples.@Tooltip": "バニラのジャングル寺院を無効にするべきかどうか。",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.pickYourPoisonEnabled": "Pick Your Poison互換性を有効にする",
-  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.pickYourPoisonEnabled.@Tooltip": "PYPの毒矢がより良いジャングル寺院に出現するべきかどうか。"
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat": "モッドの互換性",
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.@Tooltip": "モッドの互換性設定",
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general.disableVanillaJungleTemples": "バニラジャングル寺院を無効にする",
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.general.disableVanillaJungleTemples.@Tooltip": "バニラジャングル寺院を無効にするかどうか。",
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.pickYourPoisonEnabled": "Pick Your Poisonの互換性を有効にする",
+  "text.autoconfig.betterjungletemples-fabric-1_20.option.betterJungleTemples.compat.pickYourPoisonEnabled.@Tooltip": "PYP毒矢がより良いジャングル寺院にスポーンするかどうか。"
 }

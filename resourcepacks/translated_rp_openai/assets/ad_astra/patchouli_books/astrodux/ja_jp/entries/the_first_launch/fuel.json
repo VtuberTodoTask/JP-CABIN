@@ -1,0 +1,30 @@
+{
+  "name": "燃料",
+  "icon": "ad_astra:fuel_bucket",
+  "sortnum": 4,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "ロケットを設置した後でも、すぐには飛ぶことができません。飛ぶためには、ロケットに燃料を補充する必要があります。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "燃料の取得",
+      "item": "ad_astra:oil_bucket",
+      "text": "油は海面に大量に噴出しています。油は再生不可能な資源であり、各ロケットの打ち上げに多く必要なので、できるだけ多くの油を集めてください。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "燃料の取得",
+      "item": "ad_astra:fuel_bucket",
+      "text": "十分な油を集めた後（打ち上げと帰還に少なくとも6バケツ）、油を燃料に精製する必要があります。これを行うには、燃料精製所をクラフトする必要があります。電力を供給し、左のスロットに油を置くと、燃料に精製されます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "燃料精製所",
+      "recipe": "ad_astra:fuel_refinery",
+      "text": "ロケットをシフトクリックしてインベントリを開き、入力スロットに燃料のバケツを3つ置きます。残りの3つのバケツはロケットのインベントリに置いて帰還の準備をします。"
+    }
+  ]
+}

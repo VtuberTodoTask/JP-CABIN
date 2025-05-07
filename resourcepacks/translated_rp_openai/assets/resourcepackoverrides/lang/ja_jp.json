@@ -1,11 +1,11 @@
 {
-  "packAction.copyId.description": "%s を押し続けてコピー",
+  "packAction.copyId.description": "%sを押してコピー",
   "packAction.copyId.success": "コピーしました！",
   "packAction.copyId.title": "パックIDをコピー",
-  "packAction.reloadSettings.description": "%s を押し続けてリロード",
-  "packAction.reloadSettings.success": "リロードしました！",
-  "packAction.reloadSettings.title": "リロード設定",
-  "packAction.toggleDebug.description": "%s を押し続けて切り替え",
+  "packAction.reloadSettings.description": "%sを押して再読み込み",
+  "packAction.reloadSettings.success": "再読み込みしました！",
+  "packAction.reloadSettings.title": "設定を再読み込み",
+  "packAction.toggleDebug.description": "%sを押して切り替え",
   "packAction.toggleDebug.success": "切り替えました！",
   "packAction.toggleDebug.title": "パックIDを切り替え"
 }

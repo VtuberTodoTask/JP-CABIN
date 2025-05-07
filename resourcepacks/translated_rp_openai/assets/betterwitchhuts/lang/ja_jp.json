@@ -1,6 +1,6 @@
 {
-  "text.autoconfig.betterwitchhuts-fabric-1_20.title": "YUNGのより良い魔女小屋",
-  "text.autoconfig.betterwitchhuts-fabric-1_20.option.general.disableVanillaWitchHuts": "バニラの魔女小屋を無効にする",
-  "text.autoconfig.betterwitchhuts-fabric-1_20.option.general.disableVanillaWitchHuts.@Tooltip": "バニラの魔女小屋を無効にするかどうか。",
-  "Use /locate structure betterwitchhuts:witch_hut instead!": "/locate structure betterwitchhuts:witch_hut を代わりに使用してください！"
+  "text.autoconfig.betterwitchhuts-fabric-1_20.title": "YUNGのより良い魔女の小屋",
+  "text.autoconfig.betterwitchhuts-fabric-1_20.option.general.disableVanillaWitchHuts": "バニラ魔女の小屋を無効にする",
+  "text.autoconfig.betterwitchhuts-fabric-1_20.option.general.disableVanillaWitchHuts.@Tooltip": "バニラ魔女の小屋を無効にするかどうか。",
+  "Use /locate structure betterwitchhuts:witch_hut instead!": "/locate structure betterwitchhuts:witch_hut を使用してください！"
 }

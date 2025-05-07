@@ -1,16 +1,16 @@
 {
   "block.torchmaster.megatorch": "メガトーチ",
-  "block.torchmaster.megatorch.tooltip": "トーチの周りの大きな半径で敵モンスターの自然発生を防ぐ",
-  "block.torchmaster.dreadlamp": "恐怖のランプ",
-  "block.torchmaster.dreadlamp.tooltip": "ランプの周りの大きな半径でイカ、コウモリ、オセロットなどの受動的動物の自然発生を防ぐ",
-  "block.torchmaster.feral_flare_lantern": "野生のフレアランタン",
-  "block.torchmaster.feral_flare_lantern.tooltip": "見えない光を配置する",
+  "block.torchmaster.megatorch.tooltip": "トーチの周りの大きな半径で敵モンスターの自然生成を防ぎます",
+  "block.torchmaster.dreadlamp": "ドレッドランプ",
+  "block.torchmaster.dreadlamp.tooltip": "ランプの周りの大きな半径でイカ、コウモリ、オセロットなどの受動的な動物の自然生成を防ぎます",
+  "block.torchmaster.feral_flare_lantern": "フェラルフレアランタン",
+  "block.torchmaster.feral_flare_lantern.tooltip": "見えない光を配置します",
   "block.torchmaster.invisible_light": "見えない光",
   "item.torchmaster.frozen_pearl": "凍った真珠",
-  "item.torchmaster.frozen_pearl.tooltip": "野生のフレアランタンから残留光をクリアする",
+  "item.torchmaster.frozen_pearl.tooltip": "フェラルフレアランタンから残留光をクリア",
   "command.torchmaster.torch_list.completed": "トーチがログファイルにダンプされました",
   "command.torchmaster.entity_dump.completed": "エンティティがログファイルにダンプされました",
   "itemGroup.torchmaster": "トーチマスター",
-  "torchmaster.torch_volume.on_show": "トーチマスターの範囲表示が有効 - 空の手でShift+右クリックして無効にする",
+  "torchmaster.torch_volume.on_show": "トーチマスターの範囲表示が有効 - 空の手でShift+右クリックして無効にします",
   "torchmaster.torch_volume.on_hide": "トーチマスターの範囲表示が無効"
 }

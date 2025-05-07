@@ -1,0 +1,18 @@
+{
+  "name": "金星と水星",
+  "icon": "ad_astra:/textures/environment/venus.png",
+  "sortnum": 8,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "カロライト",
+      "item": "ad_astra:calorite_ingot",
+      "text": "十分なオストラムを集めて完全なネザーライト宇宙スーツセットと tier 3 ロケットのすべてのコンポーネントを作成したら、金星と水星に旅行できます。ネザーライト宇宙スーツや耐火能力なしでこれらの惑星に入ると、非常に早く死んでしまうので注意してください。次に探している材料はカロライトです。"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "カロライトは、新しい太陽系に旅行できる究極のロケットを作成するために使用されます。"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "cobblegenrandomizer.jei.cobbleCategory": "石レンガ生成",
-  "cobblegenrandomizer.jei.stoneCategory": "石生成",
-  "cobblegenrandomizer.jei.basaltCategory": "玄武岩生成",
+  "cobblegenrandomizer.jei.cobbleCategory": "石の生成中",
+  "cobblegenrandomizer.jei.stoneCategory": "石の生成中",
+  "cobblegenrandomizer.jei.basaltCategory": "玄武岩の生成中",
   "cobblegenrandomizer.jei.customCategory": "カスタム生成",
-  "cobblegenrandomizer.jei.weight": "重さ"
+  "cobblegenrandomizer.jei.weight": "重み"
 }

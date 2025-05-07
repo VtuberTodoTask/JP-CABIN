@@ -3,7 +3,7 @@
   "ctm.configuration.section.ctm.toml.title": "CTM設定",
   "ctm.configuration.section.ctm.toml": "CTM設定",
   "configuration.ctm.disable": "CTMを無効にする",
-  "configuration.ctm.disable.tooltip": "接続されたテクスチャを完全に無効にします",
-  "configuration.ctm.connect_inside": "内部CTMを接続",
-  "configuration.ctm.connect_inside.tooltip": "CTMブロックの内部コーナーが切断されるかどうかを選択します - https://imgur.com/eUywLZ4"
+  "configuration.ctm.disable.tooltip": "接続されたテクスチャを完全に無効にする",
+  "configuration.ctm.connect_inside": "内部CTMを接続する",
+  "configuration.ctm.connect_inside.tooltip": "CTMブロックの内部コーナーが切り離されているかどうかを選択します - https://imgur.com/eUywLZ4"
 }

@@ -1,5 +1,5 @@
 {
-  "_comment": "文字列 - 降水量",
+  "_comment": "文字列 - 降水",
   "item.naturescompass.naturescompass": "自然のコンパス",
   "string.naturescompass.back": "戻る",
   "string.naturescompass.info": "情報",
@@ -36,10 +36,10 @@
   "string.naturescompass.heightVariation": "高さの変動",
   "string.naturescompass.highHumidity": "高湿度",
   "string.naturescompass.name": "名前",
-  "string.naturescompass.precipitation": "降水量",
+  "string.naturescompass.precipitation": "降水",
   "string.naturescompass.rainfall": "降雨量",
   "string.naturescompass.temperature": "温度",
-  "string.naturescompass.topBlock": "トップブロック",
+  "string.naturescompass.topBlock": "上部ブロック",
   "string.naturescompass.snow": "雪",
   "string.naturescompass.rain": "雨"
 }

@@ -3,83 +3,90 @@ const { parentPort, workerData } = require('worker_threads');
 const AdmZip = require('adm-zip');
 const path = require('path');
 
-// workerDataから必要な情報を受け取る
-const {
-    jarPath,
-    sourceJsonFilename, // 例: 'en_us.json'
-    sourceLocalFilename // 例: 'en_us.local'
-} = workerData;
+const { jarPath } = workerData;
 
-// 言語ファイルを見つけるための正規表現
-// assets/<namespace>/lang/<en_us.(json|local)>
-// namespace と ファイル名(拡張子含む) をキャプチャする
+// 通常の言語ファイル用正規表現 (変更なし)
 const langFileRegex = /^assets\/([^/]+)\/lang\/(en_us\.(?:json|local))$/i;
 
+// Patchouliブックファイル用正規表現 (修正)
+// キャプチャグループ:
+// 1: namespace (例: ad_astra)
+// 2: book_id_folder (例: astrodux)
+// 3: path_and_filename_under_en_us (例: entries/the_moon/space_station.json または category.json)
+const patchouliFileRegex = /^assets\/([^/]+)\/patchouli_books\/([^/]+)\/en_us\/(.+)$/i;
+// 注意: Patchouliのファイルは .json のみと仮定。必要なら (.+\.(?:json|txt)) などに拡張。
+
+
 async function processJar() {
-    const results = []; // このJARから見つかったファイル情報を格納する配列
+    const results = [];
     const jarName = path.basename(jarPath);
-    // console.log(`[Worker ${process.pid}] Processing: ${jarName}`); // デバッグ用ログ
 
     try {
-        // AdmZipを使ってJARファイルを開く
         const zip = new AdmZip(jarPath);
-        const zipEntries = zip.getEntries(); // JAR内の全エントリを取得
+        const zipEntries = zip.getEntries();
 
-        // 各エントリをチェック
         for (const entry of zipEntries) {
-            // ディレクトリエントリは無視
             if (entry.isDirectory) {
                 continue;
             }
 
-            // パス区切り文字を '/' に正規化して正規表現でマッチング
             const entryPath = entry.entryName.replace(/\\/g, '/');
-            const match = entryPath.match(langFileRegex);
+            let match;
 
-            // 正規表現にマッチした場合 (言語ファイルが見つかった場合)
-            if (match) {
-                const namespace = match[1];        // キャプチャグループ1: namespace (modid)
-                const sourceFilename = match[2]; // キャプチャグループ2: 'en_us.json' or 'en_us.local'
-                const isJson = sourceFilename.toLowerCase().endsWith('.json');
-
-                // console.log(`[Worker ${process.pid}] Found: ${entryPath}`); // デバッグ用ログ
+            match = entryPath.match(patchouliFileRegex);
+            if (match && entryPath.toLowerCase().endsWith('.json')) { // Ensure it's a JSON file
+                const namespace = match[1];
+                const bookIdFolder = match[2];
+                const pathUnderEnUs = match[3]; // これが 'entries/the_moon/space_station.json' などになる
 
                 try {
-                    // ファイル内容をUTF-8文字列として読み込む
                     const content = entry.getData().toString('utf8');
-
-                    // メインスレッドに送信するための情報をまとめる
                     results.push({
+                        fileType: 'patchouli_book',
                         namespace: namespace,
-                        sourceFilename: sourceFilename, // 元のファイル名
-                        isJson: isJson,                 // JSONファイルかどうかのフラグ
-                        content: content,               // ファイルの内容
-                        originalJar: jarName,           // どのJARファイルから来たか (ログ用)
-                        originalPathInJar: entryPath,   // JAR内の元のパス (出力パス生成用)
+                        bookIdFolder: bookIdFolder,         // ★変更: ブックIDフォルダ名
+                        pathAndFilenameUnderSourceLang: pathUnderEnUs, // ★変更: en_us以下のパス+ファイル名
+                        content: content,
+                        originalJar: jarName,
+                        originalPathInJar: entryPath,
+                        isJson: true
                     });
                 } catch (readError) {
-                    // エントリの読み込みエラー
-                     parentPort.postMessage({
-                         type: 'error',
-                         error: `Error reading entry ${entryPath} in ${jarName}: ${readError.message}`
-                     });
+                     parentPort.postMessage({ type: 'error', error: `Error reading Patchouli entry ${entryPath} in ${jarName}: ${readError.message}` });
+                }
+            } else {
+                match = entryPath.match(langFileRegex);
+                if (match) {
+                    const namespace = match[1];
+                    const sourceFilename = match[2];
+                    const isJson = sourceFilename.toLowerCase().endsWith('.json');
+
+                    try {
+                        const content = entry.getData().toString('utf8');
+                        results.push({
+                            fileType: 'lang_file',
+                            namespace: namespace,
+                            sourceFilename: sourceFilename,
+                            isJson: isJson,
+                            content: content,
+                            originalJar: jarName,
+                            originalPathInJar: entryPath,
+                        });
+                    } catch (readError) {
+                         parentPort.postMessage({ type: 'error', error: `Error reading lang entry ${entryPath} in ${jarName}: ${readError.message}` });
+                    }
                 }
             }
-        } // エントリのループ終了
-
-        // このJARで見つかった全てのファイル情報をメインスレッドに送信
+        }
         if (results.length > 0) {
              parentPort.postMessage({ type: 'data', payload: results });
         }
 
     } catch (zipError) {
-        // JARファイル自体の読み込みエラー
          parentPort.postMessage({ type: 'error', error: `Error processing JAR ${jarName}: ${zipError.message}` });
     } finally {
-        // このWorkerの処理が完了したことをメインスレッドに通知
         parentPort.postMessage({ type: 'done' });
     }
 }
 
-// Workerが開始されたらすぐに処理を開始
 processJar();

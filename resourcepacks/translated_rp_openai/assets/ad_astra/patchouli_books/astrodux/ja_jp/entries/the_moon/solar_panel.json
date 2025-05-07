@@ -1,0 +1,20 @@
+{
+  "name": "ソーラーパネル",
+  "icon": "ad_astra:solar_panel",
+  "sortnum": 1,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ソーラーパネル",
+      "item": "ad_astra:solar_panel",
+      "text": "ソーラーパネルは石炭発電機のアップグレード版で、自己完結型でありながら、ティックあたりのエネルギーをより多く生産します。その発電量は、惑星の太陽からの距離と霧に依存します。このため、ソーラーパネルは太陽に近い場所に設置する方が効率的です。また、ソーラーパネルは軌道上でもより多くのエネルギーを生産します。大気が光を遮っていないためです。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "ソーラーパネル",
+      "text": "GUIを確認して、現在の世界でどれだけのエネルギーが生産されているかを確認してください。",
+      "recipe": "ad_astra:solar_panel"
+    }
+  ]
+}

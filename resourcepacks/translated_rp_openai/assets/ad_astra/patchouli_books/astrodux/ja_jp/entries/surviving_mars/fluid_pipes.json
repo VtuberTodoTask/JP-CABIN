@@ -1,0 +1,29 @@
+{
+  "name": "流体パイプ",
+  "icon": "ad_astra:ostrum_fluid_pipe",
+  "sortnum": 4,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "流体パイプ",
+      "item": "ad_astra:ostrum_fluid_pipe",
+      "text": "流体パイプはケーブルに似ていますが、エネルギー転送の代わりに流体転送を行います。使用するには、いくつかの流体パイプとレンチを作成します。次に、レンチでパイプの1つを右クリックすると、パイプのモードをサイクルします：'なし'、'通常'、'挿入'、および'抽出'。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "text": "'挿入'に設定されたパイプはネットワークから流体を受け取り、'抽出'に設定されたパイプはネットワークに流体をポンプします。",
+      "recipe": "ad_astra:desh_fluid_pipe"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:ostrum_fluid_pipe",
+      "recipe2": "ad_astra:wrench"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:fluid_pipe_duct",
+      "text": "ケーブルと同様に、流体パイプには密閉構造内で流体を安全に出入りさせるためのダクトブロックもあります。"
+    }
+  ]
+}

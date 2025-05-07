@@ -1,9 +1,9 @@
 {
-  "Use /locate structure betterdeserttemples:desert_temple instead!": "/locate structure betterdeserttemples:desert_templeを代わりに使用してください！",
-  "text.autoconfig.betterdeserttemples-fabric-1_20.title": "YUNGのより良い砂漠寺院",
+  "Use /locate structure betterdeserttemples:desert_temple instead!": "/locate structure betterdeserttemples:desert_templeを代わりに使用してください!",
+  "text.autoconfig.betterdeserttemples-fabric-1_20.title": "YUNGのより良い砂漠の寺院",
   "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.disableVanillaPyramids": "バニラのピラミッドを無効にする",
   "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.disableVanillaPyramids.@Tooltip": "バニラの砂漠のピラミッドを無効にするかどうか。",
-  "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.applyMiningFatigue": "採掘疲労を適用する",
+  "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.applyMiningFatigue": "採掘疲労を適用",
   "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.applyMiningFatigue.@Tooltip[0]": "寺院内のプレイヤーに採掘疲労が適用されるかどうか",
   "text.autoconfig.betterdeserttemples-fabric-1_20.option.general.applyMiningFatigue.@Tooltip[1]": "まだクリアされていない場合。"
 }

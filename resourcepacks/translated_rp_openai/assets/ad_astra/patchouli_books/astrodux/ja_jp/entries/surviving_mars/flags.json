@@ -1,0 +1,18 @@
+{
+  "name": "旗",
+  "icon": "ad_astra:blue_flag",
+  "sortnum": 1,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "旗",
+      "item": "ad_astra:lime_flag",
+      "text": "旗は16色で利用可能な装飾ブロックです。デフォルトでは、設置すると旗の所有者の顔が表示されます。右クリックしてGUIにURLを入力することで、カスタム画像を表示するように設定できます。これにより、インターネット画像が旗に表示されます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:black_flag"
+    }
+  ]
+}

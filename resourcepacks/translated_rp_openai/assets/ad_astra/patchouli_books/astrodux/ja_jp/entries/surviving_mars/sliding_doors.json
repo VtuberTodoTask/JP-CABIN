@@ -1,0 +1,29 @@
+{
+  "name": "スライディングドア",
+  "icon": "ad_astra:ostrum_sliding_door",
+  "sortnum": 3,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "スライディングドア",
+      "item": "ad_astra:airlock",
+      "text": "スライディングドアは大きな3x3のドアです。閉じると酸素を密閉し、エアロックに最適です。レンチでシフト右クリックすることでロックできます。ロックされたドアはレッドストーンでのみ開けることができます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:iron_sliding_door",
+      "recipe2": "ad_astra:steel_sliding_door"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:desh_sliding_door",
+      "recipe2": "ad_astra:ostrum_sliding_door"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:airlock",
+      "recipe2": "ad_astra:reinforced_door"
+    }
+  ]
+}

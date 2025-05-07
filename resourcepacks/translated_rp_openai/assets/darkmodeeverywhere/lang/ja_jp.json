@@ -4,10 +4,10 @@
   "gui.darkmodeeverywhere.perfect_dark": "パーフェクトダーク",
   "gui.darkmodeeverywhere.less_perfect_dark": "あまり完璧でないダーク",
   "gui.darkmodeeverywhere.toasted_light": "トーストライトモード",
-  "gui.tooltip.darkmodeeverywhere.shader_switch_tooltip": " * シフトを使ってライトモードにスキップ",
+  "gui.tooltip.darkmodeeverywhere.shader_switch_tooltip": " * シフトを使用してライトモードにスキップ",
   "config.darkemodeeverywhere.method_shader_blacklist": "ダークシェーダーが適用されないクラス:メソッド文字列（レンダーメソッド）のリスト。\\n各文字列は、ダークシェーダーをブロックするためのクラスとメソッド（または任意の部分文字列）で構成されています。\\n例えば、'renderHunger'は'net.minecraftforge.client.gui.overlay.ForgeGui:renderFood'をブロックするのに十分です（どちらでも機能します）",
-  "config.darkemodeeverywhere.method_shader_dump": "この設定を有効にすると、ダークシェーダーが適用されたGUIをレンダリングするために使用されたメソッドを（5秒ごとに）ダンプします。\\nダンプは、クラス:メソッド文字列のリストで構成されます。例：'net.minecraftforge.client.gui.overlay.ForgeGui:renderFood'\\nこの機能を使用して、ブラックリストに追加したいGUIのレンダーメソッド文字列を見つけるのに役立ててください。",
-  "config.darkemodeeverywhere.button_position_x": "GUIの左側からのピクセル（x軸）",
-  "config.darkemodeeverywhere.button_position_y": "GUIの下側からのピクセル（y軸）",
+  "config.darkemodeeverywhere.method_shader_dump": "この設定を有効にすると、（5秒ごとに）ダークシェーダーが適用されたGUIをレンダリングするために使用されたメソッドをダンプします。\\nダンプは、'net.minecraftforge.client.gui.overlay.ForgeGui:renderFood'のようなクラス:メソッド文字列のリストで構成されます。\\nこの機能を使用して、ブラックリストに追加したいGUIのレンダーメソッド文字列を見つけるのに役立ててください。",
+  "config.darkemodeeverywhere.button_position_x": "GUIの左からのピクセル（x軸）",
+  "config.darkemodeeverywhere.button_position_y": "GUIの下からのピクセル（y軸）",
   "config.darkmodeeverywhere.enabled": "有効"
 }

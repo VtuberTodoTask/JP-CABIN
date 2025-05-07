@@ -2,27 +2,29 @@
 require('dotenv').config();
 const fs = require('fs').promises;
 const path = require('path');
-const os = require('os');
+const os =require('os');
+const crypto = require('crypto'); // キャッシュキー生成用
 const { Worker } = require('worker_threads');
 const OpenAITranslator = require('./openaiTranslator'); // OpenAI対応版のTranslator
-// p-limit は動的インポートするためここでは require しない
+// p-limit は main 関数内で動的にインポート
 
 // --- Configuration ---
-const MODS_DIRECTORY = process.env.SOURCE_DIRECTORY + '/mods' || './mods';
+const MODS_DIRECTORY = process.env.SOURCE_DIRECTORY || './mods';
 const OUTPUT_RESOURCE_PACK_DIR = process.env.OUTPUT_DIRECTORY || './translated_rp_openai';
+const CACHE_DIRECTORY = path.join(__dirname, '.translation_cache_v3'); // キャッシュ用フォルダ
+const CACHE_ENABLED = process.env.CACHE_ENABLED !== 'false'; // デフォルトでキャッシュ有効
+const PROMPT_VERSION = "1.1"; // プロンプトを変更したらここを更新してキャッシュを無効化
+
 const TARGET_LANG_CODE_RP = 'ja_jp';          // リソースパック内の言語コード (ファイル名用)
 const TARGET_OPENAI_LANG_NAME = 'Japanese'; // OpenAIプロンプト用の言語名
 const OPENAI_MODEL = 'gpt-4o-mini';          // 使用するOpenAIモデル
 const MINECRAFT_VERSION = '1.20.1';        // pack.mcmeta生成用
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-// 同時に実行するWorkerの最大数 (CPUコア数をデフォルトに)
+
 const MAX_CONCURRENT_WORKERS = parseInt(process.env.MAX_WORKERS || os.cpus().length, 10);
-// 1バッチあたりの最大テキスト数（応答が途切れないように調整する）
-const MAX_TEXTS_PER_BATCH = 100; // 例: 100件ずつAPIに送る
-// 同時に実行するファイル書き込みの最大数
-const MAX_CONCURRENT_WRITES = 15;
-// 同時に実行するOpenAI API呼び出しの最大数 (現在は逐次実行だが、並列化する場合に使う)
-const MAX_CONCURRENT_API_CALLS = 5;
+const MAX_TEXTS_PER_BATCH = 100; // 1回のOpenAI API呼び出しに含める最大テキスト数
+const MAX_CONCURRENT_WRITES = 15; // 同時に実行するファイル書き込みの最大数
+const MAX_CONCURRENT_API_CALLS = 5; // 同時に実行するOpenAI API呼び出しの最大数
 // ---------------------
 
 // Pack Format Calculation
@@ -31,17 +33,14 @@ const PACK_FORMAT_MAP = {
 };
 const PACK_FORMAT = PACK_FORMAT_MAP[MINECRAFT_VERSION] || 15;
 
-// Filenames
-const sourceJsonFilename = `en_us.json`;
-const sourceLocalFilename = `en_us.local`;
+// Target Filenames for regular lang files
 const targetJsonFilename = `${TARGET_LANG_CODE_RP}.json`;
 const targetLocalFilename = `${TARGET_LANG_CODE_RP}.local`;
-
 
 // --- Helper Function for .local Parsing ---
 function parseLocalContent(localContent) {
     const lines = localContent.split(/\r?\n/);
-    const parsed = []; // { type: 'kv'|'comment'|'empty'|'other', key?: string, value?: string, originalLine: string, lineNumber: number }
+    const parsed = [];
     lines.forEach((line, index) => {
         const trimmedLine = line.trim();
         const lineNumber = index + 1;
@@ -64,335 +63,281 @@ function parseLocalContent(localContent) {
 function reconstructLocal(parsedData) {
      return parsedData.map(item => {
         if (item.type === 'kv') {
-            // Use item.translatedValue if it exists, otherwise original value
             const valueToUse = item.translatedValue !== undefined ? item.translatedValue : item.value;
             return `${item.key}=${valueToUse}`;
-        } else {
-            // Preserve comments, empty lines, other lines
-            return item.originalLine;
-        }
-    }).join('\n'); // Use '\n' as the standard newline for output
+        } else { return item.originalLine; }
+    }).join('\n');
 }
 
+// --- Cache Helper Functions ---
+function getCacheKey(fileInfo, targetLangCode, promptVer = PROMPT_VERSION) {
+    const keyString = `${fileInfo.originalJar}-${fileInfo.originalPathInJar}-${targetLangCode}-${promptVer}`;
+    return crypto.createHash('md5').update(keyString).digest('hex');
+}
+
+async function readFromCache(cacheKey) {
+    if (!CACHE_ENABLED) return null;
+    const cacheFilePath = path.join(CACHE_DIRECTORY, `${cacheKey}.json`); // Cache content as JSON string
+    try {
+        const cachedData = await fs.readFile(cacheFilePath, 'utf8');
+        return JSON.parse(cachedData); // Returns the stored object or string
+    } catch (error) {
+        if (error.code !== 'ENOENT') console.warn(`[Cache] Error reading cache for key ${cacheKey}:`, error.message);
+        return null;
+    }
+}
+
+async function writeToCache(cacheKey, dataToCache) {
+    if (!CACHE_ENABLED) return;
+    const cacheFilePath = path.join(CACHE_DIRECTORY, `${cacheKey}.json`);
+    try {
+        await fs.mkdir(path.dirname(cacheFilePath), { recursive: true });
+        await fs.writeFile(cacheFilePath, JSON.stringify(dataToCache, null, 2), 'utf8'); // Store as pretty JSON
+        // console.log(`[Cache] SAVED key ${cacheKey}`);
+    } catch (error) {
+        console.warn(`[Cache] Error writing cache for key ${cacheKey}:`, error.message);
+    }
+}
 
 // --- Main Execution Function ---
 async function main() {
-    // --- Dynamic Import for p-limit ---
     const pLimit = (await import('p-limit')).default;
 
-    console.log("=============================================");
-    console.log(" MOD Lang Translation (OpenAI Worker Threads)");
-    console.log("=============================================");
-    console.log(`Model: ${OPENAI_MODEL}, Target: ${TARGET_OPENAI_LANG_NAME}`);
-    console.log(`Max Concurrent Workers: ${MAX_CONCURRENT_WORKERS}`);
-    console.log(`Max Texts per API Batch: ${MAX_TEXTS_PER_BATCH}`);
+    console.log("==================================================");
+    console.log(" Minecraft Mod Translation (OpenAI + Cache + Workers)");
+    console.log("==================================================");
+    console.log(`Model: ${OPENAI_MODEL}, Target: ${TARGET_OPENAI_LANG_NAME}, PromptVer: ${PROMPT_VERSION}`);
+    console.log(`Cache Enabled: ${CACHE_ENABLED}, Dir: ${CACHE_DIRECTORY}`);
     const startTime = Date.now();
 
-    // --- Initial Checks & Setup ---
-    if (!OPENAI_API_KEY) {
-        console.error("[Main Error] OPENAI_API_KEY is not set in .env");
-        process.exit(1);
-    }
-    if (!MODS_DIRECTORY) {
-        console.error("[Main Error] SOURCE_DIRECTORY is not set in .env");
-        process.exit(1);
-    }
+    if (!OPENAI_API_KEY) { console.error("[Main Error] OPENAI_API_KEY is not set in .env"); process.exit(1); }
+    if (!MODS_DIRECTORY) { console.error("[Main Error] SOURCE_DIRECTORY is not set in .env"); process.exit(1); }
 
     let translator;
     try {
         translator = new OpenAITranslator(OPENAI_API_KEY, TARGET_OPENAI_LANG_NAME, OPENAI_MODEL);
         console.log("[Main] OpenAI Translator initialized.");
-    } catch (initError) {
-        console.error("[Main] Failed to initialize Translator:", initError.message);
-        process.exit(1);
-    }
+    } catch (e) { console.error("[Main] Failed to initialize Translator:", e.message); process.exit(1); }
 
     const absoluteOutputDir = path.resolve(OUTPUT_RESOURCE_PACK_DIR);
     try {
         await fs.mkdir(absoluteOutputDir, { recursive: true });
-        const packMetaContent = { pack: { pack_format: PACK_FORMAT, description: `Mod Language Translations (${TARGET_LANG_CODE_RP}) using ${OPENAI_MODEL}` } };
-        await fs.writeFile(path.join(absoluteOutputDir, 'pack.mcmeta'), JSON.stringify(packMetaContent, null, 2), 'utf8');
+        const packMeta = { pack: { pack_format: PACK_FORMAT, description: `Mod Translations (${TARGET_LANG_CODE_RP}) [${OPENAI_MODEL}, PV${PROMPT_VERSION}]` } };
+        await fs.writeFile(path.join(absoluteOutputDir, 'pack.mcmeta'), JSON.stringify(packMeta, null, 2), 'utf8');
         console.log(`[Main] Output directory and pack.mcmeta prepared: ${absoluteOutputDir}`);
-    } catch (dirError) {
-        console.error(`[Main] Failed to prepare output directory (${absoluteOutputDir}):`, dirError);
-        process.exit(1);
+    } catch (e) { console.error(`[Main] Failed to prepare output directory:`, e); process.exit(1); }
+
+    if (CACHE_ENABLED) {
+        try { await fs.mkdir(CACHE_DIRECTORY, { recursive: true }); console.log(`[Cache] Cache directory ensured: ${CACHE_DIRECTORY}`); }
+        catch (e) { console.warn(`[Cache] Could not create cache directory: ${e.message}`); }
     }
 
-    // --- Scan for JAR files ---
     let modFiles = [];
     const absoluteModsDir = path.resolve(MODS_DIRECTORY);
     try {
         const entries = await fs.readdir(absoluteModsDir, { withFileTypes: true });
-        modFiles = entries
-            .filter(dirent => dirent.isFile() && dirent.name.toLowerCase().endsWith('.jar'))
-            .map(dirent => path.join(absoluteModsDir, dirent.name)); // Use absolute paths
+        modFiles = entries.filter(d => d.isFile() && d.name.toLowerCase().endsWith('.jar')).map(d => path.join(absoluteModsDir, d.name));
         console.log(`[Main] Found ${modFiles.length} JAR files in ${absoluteModsDir}.`);
-    } catch (readDirError) {
-        console.error(`[Main] Failed to read mods directory (${absoluteModsDir}):`, readDirError);
-        process.exit(1);
-    }
+    } catch (e) { console.error(`[Main] Failed to read mods directory:`, e); process.exit(1); }
+    if (modFiles.length === 0) { console.log("[Main] No JAR files found. Exiting."); return; }
 
-    if (modFiles.length === 0) {
-        console.log("[Main] No JAR files found. Exiting.");
-        return;
-    }
-
-    // --- Process JARs using Workers ---
     const workerLimit = pLimit(MAX_CONCURRENT_WORKERS);
-    const allFileInfos = []; // Collects { namespace, isJson, content, originalJar, originalPathInJar }
-    console.log(`[Main] Starting worker tasks with concurrency limit: ${MAX_CONCURRENT_WORKERS}...`);
-
-    const workerPromises = modFiles.map(jarPath => workerLimit(() => {
-        return new Promise((resolve, reject) => {
-            const worker = new Worker(path.resolve('./worker.js'), {
-                workerData: { jarPath, sourceJsonFilename, sourceLocalFilename }
-            });
-            worker.on('message', (message) => {
-                if (message.type === 'data') allFileInfos.push(...message.payload);
-                else if (message.type === 'error') console.error(`[Worker Error][${path.basename(jarPath)}] ${message.error}`);
-            });
-            worker.on('error', reject);
-            worker.on('exit', (code) => { if (code !== 0) console.warn(`Worker for ${path.basename(jarPath)} exited code ${code}`); resolve(); });
+    const langFileInfos = [];
+    const patchouliBookInfos = [];
+    console.log(`[Main] Starting worker tasks (concurrency: ${MAX_CONCURRENT_WORKERS})...`);
+    const workerPromises = modFiles.map(jarPath => workerLimit(() => new Promise((resolve, reject) => {
+        const worker = new Worker(path.resolve('./worker.js'), { workerData: { jarPath } });
+        worker.on('message', msg => {
+            if (msg.type === 'data') msg.payload.forEach(fi => fi.fileType === 'patchouli_book' ? patchouliBookInfos.push(fi) : langFileInfos.push(fi));
+            else if (msg.type === 'error') console.error(`[Worker Error][${path.basename(jarPath)}] ${msg.error}`);
         });
-    }));
+        worker.on('error', reject);
+        worker.on('exit', code => { if (code !== 0) console.warn(`Worker for ${path.basename(jarPath)} exited code ${code}`); resolve(); });
+    })));
+    try { await Promise.all(workerPromises); console.log("[Main] All workers finished JAR processing."); }
+    catch (e) { console.error("[Main] Critical worker error:", e); process.exit(1); }
+    const jarProcessingEndTime = Date.now();
+    console.log(`[Main] JAR processing took ${((jarProcessingEndTime - startTime) / 1000).toFixed(2)}s.`);
+    console.log(`[Main] Collected ${langFileInfos.length} regular lang file(s) and ${patchouliBookInfos.length} Patchouli book file(s).`);
 
-    try {
-        await Promise.all(workerPromises);
-        console.log("[Main] All worker tasks completed processing JARs.");
-    } catch (workerError) {
-        console.error("[Main] A critical worker error occurred during JAR processing, stopping:", workerError);
-        process.exit(1);
-    }
-    const processingEndTime = Date.now();
-    console.log(`[Main] JAR processing took ${((processingEndTime - startTime) / 1000).toFixed(2)} seconds.`);
-    console.log(`[Main] Collected ${allFileInfos.length} language file contents.`);
+    // --- Prepare data for writing ---
+    const filesToWrite = []; // { outputPath: string, finalContent: string, outputDirToCreate: string }
 
+    // --- Process Regular Lang Files ---
+    const individualLangTextsToTranslate = [];
+    const langFileReconstructionData = new Map(); // fileInfoIndex -> { type, data, namespace, originalPathInJar }
 
-    // --- Step 1: Extract Individual Texts ---
-    const individualTextsToTranslate = []; // { text: string, originalFileIndex: number, originalKey?: string, originalLineNumber?: number }
-    const fileReconstructionData = new Map(); // Map<number, { type: 'json'|'local'|'error', data: any | Array<parsedLine>, namespace: string, originalPathInJar: string }>
+    if (langFileInfos.length > 0) {
+        console.log("[Main] Processing regular lang files (checking cache)...");
+        for (let fileIndex = 0; fileIndex < langFileInfos.length; fileIndex++) {
+            const fileInfo = langFileInfos[fileIndex];
+            const cacheKey = getCacheKey(fileInfo, TARGET_LANG_CODE_RP);
+            const cachedFinalContent = await readFromCache(cacheKey);
 
-    console.log("[Main] Extracting individual texts from file contents...");
-    allFileInfos.forEach((fileInfo, fileIndex) => {
-        try {
-            if (!fileInfo || typeof fileInfo.content !== 'string') {
-                 console.warn(`[Main] Skipping file index ${fileIndex} due to invalid fileInfo or missing content (from ${fileInfo?.originalJar || 'unknown JAR'}).`);
-                 fileReconstructionData.set(fileIndex, { type: 'error', data: 'Invalid content received', namespace: fileInfo?.namespace || 'unknown', originalPathInJar: fileInfo?.originalPathInJar || 'unknown' });
-                 return;
-            }
+            const targetFilename = fileInfo.isJson ? targetJsonFilename : targetLocalFilename;
+            const relativeDir = path.dirname(fileInfo.originalPathInJar);
+            const outputDir = path.join(absoluteOutputDir, relativeDir);
+            const outputPath = path.join(outputDir, targetFilename);
 
-            if (fileInfo.isJson) {
-                const jsonData = JSON.parse(fileInfo.content);
-                // Initialize reconstruction data with original parsed JSON
-                const reconstructionInfo = { type: 'json', data: jsonData, namespace: fileInfo.namespace, originalPathInJar: fileInfo.originalPathInJar };
-                Object.entries(jsonData).forEach(([key, value]) => {
-                    if (typeof value === 'string' && value.trim() !== '') {
-                        individualTextsToTranslate.push({
-                            text: value,
-                            originalFileIndex: fileIndex,
-                            originalKey: key
-                        });
-                    }
-                    // Note: reconstructionInfo.data already holds the original key-value
-                });
-                fileReconstructionData.set(fileIndex, reconstructionInfo);
-            } else { // .local file
-                const parsedLines = parseLocalContent(fileInfo.content);
-                // Initialize reconstruction data with parsed lines
-                const reconstructionInfo = { type: 'local', data: parsedLines, namespace: fileInfo.namespace, originalPathInJar: fileInfo.originalPathInJar };
-                parsedLines.forEach((lineData) => { // No need for lineIndex here
-                    if (lineData.type === 'kv' && typeof lineData.value === 'string' && lineData.value.trim() !== '') {
-                        individualTextsToTranslate.push({
-                            text: lineData.value,
-                            originalFileIndex: fileIndex,
-                            originalLineNumber: lineData.lineNumber // Use lineNumber to identify the line later
-                        });
-                    }
-                    // Note: reconstructionInfo.data already holds the original line objects
-                });
-                 fileReconstructionData.set(fileIndex, reconstructionInfo);
-            }
-        } catch (parseError) {
-            console.warn(`[Main] Failed to parse content from ${fileInfo.originalJar} - ${fileInfo.originalPathInJar}: ${parseError.message}. Skipping this file.`);
-            fileReconstructionData.set(fileIndex, { type: 'error', data: fileInfo.content, namespace: fileInfo.namespace, originalPathInJar: fileInfo.originalPathInJar });
-        }
-    });
-    console.log(`[Main] Extracted ${individualTextsToTranslate.length} individual text strings to translate.`);
-
-
-    // --- Step 2: Batch Translate Individual Texts ---
-    const translatedTextMap = new Map(); // Map<number, string> - Maps index in individualTextsToTranslate -> translated text
-    if (individualTextsToTranslate.length > 0) {
-        console.log("[Main] Preparing translation batches for individual texts...");
-        const translationStartTime = Date.now();
-        const batches = [];
-        let currentBatchTexts = [];
-        let currentBatchIndices = []; // Stores indices from individualTextsToTranslate
-
-        individualTextsToTranslate.forEach((textInfo, index) => {
-            currentBatchTexts.push(textInfo.text);
-            currentBatchIndices.push(index); // Store index within individualTextsToTranslate
-
-            if (currentBatchTexts.length >= MAX_TEXTS_PER_BATCH) {
-                batches.push({ texts: currentBatchTexts, indices: currentBatchIndices });
-                currentBatchTexts = [];
-                currentBatchIndices = [];
-            }
-        });
-        if (currentBatchTexts.length > 0) {
-            batches.push({ texts: currentBatchTexts, indices: currentBatchIndices });
-        }
-        console.log(`[Main] Split into ${batches.length} translation batches (max ${MAX_TEXTS_PER_BATCH} texts per batch).`);
-
-        // Process batches sequentially for simplicity, add p-limit here if needed
-        const translationLimit = pLimit(MAX_CONCURRENT_API_CALLS);
-        let translationFailed = false;
-        let fatalErrorOccurred = false;
-
-        const translationPromises = batches.map((batch, i) => translationLimit(async () => {
-        // async function processBatchesSequentially() { // Alternative: Sequential Loop
-        //    for (let i = 0; i < batches.length; i++) { // Alternative: Sequential Loop
-                if (fatalErrorOccurred) return; // Skip if fatal error already happened
-                // const batch = batches[i]; // Alternative: Sequential Loop
-                console.log(`[Main] Translating batch ${i + 1}/${batches.length} (${batch.texts.length} texts)...`);
-                try {
-                    // Create prompt indices (0 to N-1) for the current batch
-                    const promptIndices = batch.texts.map((_, idx) => idx);
-                    // Call internal translation method
-                    const internalResultMap = await translator.translateBatchInternal(batch.texts, promptIndices);
-
-                    // Map results back using the batch's original index mapping
-                    internalResultMap.forEach((translatedText, promptIndex) => {
-                        const originalIndividualTextIndex = batch.indices[promptIndex]; // Get index in individualTextsToTranslate
-                        translatedTextMap.set(originalIndividualTextIndex, translatedText); // Store translation mapped to its overall index
-                    });
-
-                } catch (translationError) {
-                    console.error(`[Main] Batch ${i + 1} translation failed: ${translationError.message}`);
-                    if (translationError.message.includes("Quota Exceeded") || translationError.message.includes("Authorization Failed")) {
-                        fatalErrorOccurred = true; // Signal fatal error
-                        throw translationError; // Re-throw to stop Promise.all (if using it)
-                    }
-                    // Non-fatal: Mark items in this batch as untranslated (they won't be in translatedTextMap)
-                    console.warn(`[Main] Original text will be used for items in failed batch ${i + 1}.`);
-                }
-        //    } // Alternative: Sequential Loop
-        // } // Alternative: Sequential Loop
-        // await processBatchesSequentially(); // Alternative: Sequential Loop
-         })); // End batches.map for Promise.all
-
-        try {
-             await Promise.all(translationPromises); // Wait for all concurrent batches
-        } catch (batchError) {
-             // Catch fatal errors re-thrown from the batch processing
-             console.error("[Main] Fatal error during batch translation processing. Aborting.");
-             translationFailed = true; // Ensure flag is set
-             // process.exit(1); // Exit directly or let it flow down
-        }
-
-
-        if (translationFailed) {
-            console.error("[Main] Translation process aborted due to fatal API error.");
-            process.exit(1);
-        }
-        const translationEndTime = Date.now();
-        console.log(`[Main] All batch translations finished in ${((translationEndTime - translationStartTime) / 1000).toFixed(2)}s.`);
-
-    } else {
-        console.log("[Main] No individual texts found to translate.");
-    }
-
-
-    // --- Step 3: Reconstruct Files and Write ---
-    console.log("[Main] Reconstructing and writing translated files...");
-    const writeStartTime = Date.now();
-    const writeLimit = pLimit(MAX_CONCURRENT_WRITES);
-    let writeCount = 0;
-    const writePromises = [];
-
-    // Map individual results back to their original files before writing
-    individualTextsToTranslate.forEach((textInfo, index) => {
-         const translatedText = translatedTextMap.get(index) ?? textInfo.text; // Get translated or fallback to original
-         const fileIndex = textInfo.originalFileIndex;
-         const reconData = fileReconstructionData.get(fileIndex);
-
-         if (reconData && reconData.type !== 'error') { // Only process if reconstruction data exists and no prior error
-             if (reconData.type === 'json') {
-                 // Update the JSON data object stored in reconData
-                 if (textInfo.originalKey && reconData.data.hasOwnProperty(textInfo.originalKey)) {
-                     reconData.data[textInfo.originalKey] = translatedText;
-                 }
-             } else if (reconData.type === 'local') {
-                 // Find the corresponding line in parsed data array and set translatedValue
-                 const lineToUpdate = reconData.data.find(line => line.lineNumber === textInfo.originalLineNumber && line.type === 'kv');
-                 if (lineToUpdate) {
-                     lineToUpdate.translatedValue = translatedText; // Store translation temporarily
-                 }
-             }
-         }
-    });
-
-    // Now, iterate through the updated reconstruction data to finalize content and create write promises
-    for (const [fileIndex, reconData] of fileReconstructionData.entries()) {
-        let finalContent = '';
-        let outputPath = '';
-
-        // Skip files that had errors during initial parsing or don't exist in map
-        if (!reconData || reconData.type === 'error') {
-            console.warn(`[Main] Skipping write for file originally at ${reconData?.originalPathInJar || `index ${fileIndex}`} due to initial processing error.`);
-            continue;
-        }
-
-        try {
-            // Determine output path
-            const targetFilename = reconData.type === 'json' ? targetJsonFilename : targetLocalFilename;
-            const relativeDir = path.dirname(reconData.originalPathInJar);
-            const outputLangDir = path.join(OUTPUT_RESOURCE_PACK_DIR, relativeDir); // Use relativeDir directly
-            outputPath = path.join(outputLangDir, targetFilename);
-
-            // Reconstruct content based on type
-            if (reconData.type === 'json') {
-                // Use the data object which has been updated with translations
-                finalContent = JSON.stringify(reconData.data, null, 2); // Pretty print
-            } else if (reconData.type === 'local') {
-                // Use the reconstructLocal helper with the updated data array
-                 finalContent = reconstructLocal(reconData.data);
+            if (cachedFinalContent !== null) {
+                console.log(`  [Cache HIT] Lang: ${fileInfo.originalPathInJar}`);
+                filesToWrite.push({ outputPath, finalContent: cachedFinalContent, outputDirToCreate: outputDir });
+                langFileReconstructionData.set(fileIndex, { type: 'cached' }); // Mark as cached
             } else {
-                 console.warn(`[Main] Unknown reconstruction type for file index ${fileIndex}`);
-                 continue; // Skip unknown types
+                console.log(`  [Cache MISS] Lang: ${fileInfo.originalPathInJar}`);
+                try {
+                    if (!fileInfo.content) throw new Error("Missing content");
+                    if (fileInfo.isJson) {
+                        const jsonData = JSON.parse(fileInfo.content);
+                        langFileReconstructionData.set(fileIndex, { type: 'json', data: jsonData, namespace: fileInfo.namespace, originalPathInJar: fileInfo.originalPathInJar });
+                        Object.entries(jsonData).forEach(([key, value]) => {
+                            if (typeof value === 'string' && value.trim() !== '') {
+                                individualLangTextsToTranslate.push({ text: value, originalFileIndex: fileIndex, originalKey: key });
+                            }
+                        });
+                    } else { // .local
+                        const parsedLines = parseLocalContent(fileInfo.content);
+                        langFileReconstructionData.set(fileIndex, { type: 'local', data: parsedLines, namespace: fileInfo.namespace, originalPathInJar: fileInfo.originalPathInJar });
+                        parsedLines.forEach((lineData) => {
+                            if (lineData.type === 'kv' && typeof lineData.value === 'string' && lineData.value.trim() !== '') {
+                                individualLangTextsToTranslate.push({ text: lineData.value, originalFileIndex: fileIndex, originalLineNumber: lineData.lineNumber });
+                            }
+                        });
+                    }
+                } catch (e) { console.warn(`[Main] Error parsing lang file ${fileInfo.originalPathInJar}: ${e.message}`); langFileReconstructionData.set(fileIndex, { type: 'error' });}
+            }
+        }
+        console.log(`[Main] Extracted ${individualLangTextsToTranslate.length} individual lang texts for API translation.`);
+
+        if (individualLangTextsToTranslate.length > 0) {
+            const langTextBatches = []; let currentBatchTexts = []; let currentBatchIndices = [];
+            individualLangTextsToTranslate.forEach((textInfo, index) => {
+                currentBatchTexts.push(textInfo.text); currentBatchIndices.push(index);
+                if (currentBatchTexts.length >= MAX_TEXTS_PER_BATCH) {
+                    langTextBatches.push({ texts: currentBatchTexts, indices: currentBatchIndices });
+                    currentBatchTexts = []; currentBatchIndices = [];
+                }
+            });
+            if (currentBatchTexts.length > 0) langTextBatches.push({ texts: currentBatchTexts, indices: currentBatchIndices });
+            console.log(`[Main] Split lang texts into ${langTextBatches.length} API batches.`);
+
+            const apiLimit = pLimit(MAX_CONCURRENT_API_CALLS); let fatalApiError = false;
+            const translatedLangTextMap = new Map(); // index in individualLangTextsToTranslate -> translated_text
+
+            const langTranslationPromises = langTextBatches.map((batch, i) => apiLimit(async () => {
+                if (fatalApiError) return;
+                console.log(`[Main] Translating lang batch ${i + 1}/${langTextBatches.length} (${batch.texts.length} texts)...`);
+                try {
+                    const promptIndices = batch.texts.map((_, idx) => idx);
+                    const internalResultMap = await translator.translateBatchInternal(batch.texts, promptIndices, 0);
+                    internalResultMap.forEach((txt, pIdx) => translatedLangTextMap.set(batch.indices[pIdx], txt));
+                } catch (e) {
+                    console.error(`[Main] Lang batch ${i + 1} failed: ${e.message}`);
+                    if (e.message.includes("Quota Exceeded")||e.message.includes("Authorization Failed")){fatalApiError=true; throw e;}
+                }
+            }));
+            try { await Promise.all(langTranslationPromises); } catch (e) { console.error("[Main] Fatal API error during lang translation."); process.exit(1); }
+            console.log("[Main] Lang text API translation finished.");
+
+            // Reconstruct and add to filesToWrite
+            individualLangTextsToTranslate.forEach((textInfo, index) => {
+                const translatedText = translatedLangTextMap.get(index) ?? textInfo.text;
+                const reconData = langFileReconstructionData.get(textInfo.originalFileIndex);
+                if (reconData && reconData.type !== 'error' && reconData.type !== 'cached') {
+                    if (reconData.type === 'json' && textInfo.originalKey) reconData.data[textInfo.originalKey] = translatedText;
+                    else if (reconData.type === 'local') {
+                        const lineToUpdate = reconData.data.find(l => l.lineNumber === textInfo.originalLineNumber && l.type === 'kv');
+                        if (lineToUpdate) lineToUpdate.translatedValue = translatedText;
+                    }
+                }
+            });
+
+            for (const [fileIndex, reconData] of langFileReconstructionData.entries()) {
+                if (reconData && reconData.type !== 'error' && reconData.type !== 'cached') {
+                    const fileInfo = langFileInfos[fileIndex];
+                    const targetFilename = reconData.type === 'json' ? targetJsonFilename : targetLocalFilename;
+                    const relativeDir = path.dirname(reconData.originalPathInJar);
+                    const outputDir = path.join(absoluteOutputDir, relativeDir);
+                    const outputPath = path.join(outputDir, targetFilename);
+                    const finalContent = reconData.type === 'json' ? JSON.stringify(reconData.data, null, 2) : reconstructLocal(reconData.data);
+                    filesToWrite.push({ outputPath, finalContent, outputDirToCreate: outputDir });
+                    await writeToCache(getCacheKey(fileInfo, TARGET_LANG_CODE_RP), finalContent);
+                }
+            }
+        }
+    }
+
+    // --- Translate Patchouli Books (キャッシュ対応) ---
+    if (patchouliBookInfos.length > 0) {
+        console.log(`\n[Main] Processing ${patchouliBookInfos.length} Patchouli book files (checking cache)...`);
+        const patchouliApiLimit = pLimit(MAX_CONCURRENT_API_CALLS);
+        let fatalPatchouliError = false;
+
+        const patchouliPromises = patchouliBookInfos.map((bookInfo, index) => patchouliApiLimit(async () => {
+            if (fatalPatchouliError) return;
+            const cacheKey = getCacheKey(bookInfo, TARGET_LANG_CODE_RP, translator.getSystemPromptString());
+            const cachedTranslatedObject = await readFromCache(cacheKey);
+
+            const outputDir = path.join(absoluteOutputDir, 'assets', bookInfo.namespace, 'patchouli_books', bookInfo.bookIdFolder, TARGET_LANG_CODE_RP);
+            const outputFilePath = path.join(outputDir, bookInfo.pathAndFilenameUnderSourceLang); // Filename from worker
+            const outputDirForThisFile = path.dirname(outputFilePath); // path.dirname to get the actual directory for mkdir
+
+            if (cachedTranslatedObject !== null) {
+                console.log(`  [Cache HIT] Patchouli: ${bookInfo.originalPathInJar}`);
+                filesToWrite.push({ outputPath: outputFilePath, finalContent: JSON.stringify(cachedTranslatedObject, null, 2), outputDirToCreate: outputDirForThisFile });
+                return;
             }
 
-            // Create write promise and add to array
-            writePromises.push(writeLimit(async () => {
-                 try {
-                     await fs.mkdir(path.dirname(outputPath), { recursive: true }); // Ensure directory exists
-                     await fs.writeFile(outputPath, finalContent, 'utf8');
-                     writeCount++;
-                 } catch (writeError) {
-                     console.error(`[Main] Failed to write reconstructed file ${outputPath}: ${writeError.message}`);
-                 }
-             }));
+            console.log(`  [Cache MISS] Translating Patchouli book: ${bookInfo.originalPathInJar}`);
+            try {
+                const jsonData = JSON.parse(bookInfo.content);
+                const translatedBookJson = await translator.translatePatchouliBookObject(jsonData);
+                const finalContent = JSON.stringify(translatedBookJson, null, 2);
+                filesToWrite.push({ outputPath: outputFilePath, finalContent, outputDirToCreate: outputDirForThisFile });
+                await writeToCache(cacheKey, translatedBookJson); // Cache the translated object
+            } catch (error) {
+                console.error(`  [Error] Failed to translate Patchouli book ${bookInfo.originalPathInJar}: ${error.message}`);
+                if (error.message.includes("Quota Exceeded") || error.message.includes("Authorization Failed")) {
+                    fatalPatchouliError = true; throw error;
+                }
+                // Non-fatal, write original content if possible
+                filesToWrite.push({ outputPath: outputFilePath, finalContent: bookInfo.content, outputDirToCreate: outputDirForThisFile });
+            }
+        }));
+        try { await Promise.all(patchouliPromises); } catch(e) { console.error("[Main] Fatal API error during Patchouli translation."); process.exit(1); }
+        console.log("[Main] Patchouli book translation/cache check finished.");
+    }
 
-        } catch (reconError) {
-             console.error(`[Main] Failed to reconstruct or prepare write for file index ${fileIndex} (original: ${reconData.originalPathInJar}): ${reconError.message}`);
-        }
-    } // End loop through fileReconstructionData
+    // --- Write All Files ---
+    if (filesToWrite.length > 0) {
+        console.log(`[Main] Writing ${filesToWrite.length} processed files...`);
+        const writeStartTime = Date.now();
+        const writeLimit = pLimit(MAX_CONCURRENT_WRITES);
+        let totalFilesWritten = 0;
 
+        const allWritePromises = filesToWrite.map(writeInfo => writeLimit(async () => {
+            try {
+                await fs.mkdir(writeInfo.outputDirToCreate, { recursive: true });
+                await fs.writeFile(writeInfo.outputPath, writeInfo.finalContent, 'utf8');
+                totalFilesWritten++;
+            } catch (e) { console.error(`[Main] Failed to write file to ${writeInfo.outputPath}: ${e.message}`); }
+        }));
 
-    // Wait for all file write operations to complete
-    await Promise.all(writePromises);
-    const writeEndTime = Date.now();
-    console.log(`[Main] File writing complete (${writeCount} files written) in ${((writeEndTime - writeStartTime) / 1000).toFixed(2)}s.`);
+        try { await Promise.all(allWritePromises); }
+        catch (finalWriteError) { console.error("[Main] Error during aggregated file write operations:", finalWriteError); }
+        const writeEndTime = Date.now();
+        console.log(`[Main] All file writing complete (${totalFilesWritten} files written) in ${((writeEndTime - writeStartTime) / 1000).toFixed(2)}s.`);
+    } else {
+        console.log("[Main] No files to write.");
+    }
 
-
-    // --- Final Timing ---
+    // --- Final Timing & Log ---
     const mainEndTime = Date.now();
     console.log("\n=============================================");
     console.log(` Resource Pack Creation Finished (Total Time: ${((mainEndTime - startTime) / 1000).toFixed(2)}s)`);
     console.log("=============================================");
     console.log(`Output located at: ${path.resolve(OUTPUT_RESOURCE_PACK_DIR)}`);
 }
-
 
 // --- Run Main Function ---
 main().catch(err => {

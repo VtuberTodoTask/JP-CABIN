@@ -1,0 +1,29 @@
+{
+  "name": "ローバー",
+  "icon": "ad_astra:tier_1_rover",
+  "sortnum": 5,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ローバー",
+      "item": "ad_astra:tier_1_rover",
+      "text": "ローバーは、月や惑星の荒れた地形を走行できる陸上車両です。非常に速く、16アイテムを収納できるインベントリを持ち、複数のライダー用に2つの座席があります。また、モブを轢くことができ、かなりのダメージを与えることができます。使用するには、ローバーに燃料を補充してください（シフトクリックして左の入力スロットに燃料バケツを置きます）。"
+    },
+    {
+      "type": "patchouli:entity",
+      "entity": "ad_astra:tier_1_rover",
+      "scale": 0.36
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "ローバーレシピ",
+      "recipe": "ad_astra:tier_1_rover"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "ラジオ",
+      "text": "ローバーには、実際のインターネットストリーミングラジオ局を再生するための内蔵ラジオがあります。ローバーのラジオと対話するか、($(k:ad_astra.open_radio))を押すことで使用できます。複数のプレイヤーがローバーにいる場合、同じラジオを聞くことができます。"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "ラジオ",
+  "icon": "ad_astra:radio",
+  "sortnum": 7,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ラジオ",
+      "item": "ad_astra:radio",
+      "text": "起動する前に、音楽を聴いてみませんか？ラジオは、実際のインターネットストリーミングラジオ局を再生するブロックです！いくつかのジャンルの中で、聴くことができる局があります。さらに、近くにいる誰もが同じ局を聞くことができます。最終的には、ラジオを使ってローバーを作成できるようになり、ローバーには音楽を聴きながら運転するための内蔵ラジオが搭載されています。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:radio"
+    }
+  ]
+}

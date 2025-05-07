@@ -1,0 +1,19 @@
+{
+  "name": "Ti-69",
+  "icon": "ad_astra:ti_69",
+  "sortnum": 4,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "Ti-69",
+      "item": "ad_astra:ti_69",
+      "text": "Ti-69は、地域の酸素、温度、重力を表示するモバイルデバイスです。エリアが安全かどうかを確認するために使用してください。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "Ti-69 レシピ",
+      "recipe": "ad_astra:ti_69"
+    }
+  ]
+}

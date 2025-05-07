@@ -1,0 +1,19 @@
+{
+  "name": "重力ノーマライザー",
+  "icon": "ad_astra:gravity_normalizer",
+  "sortnum": 3,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "重力ノーマライザー",
+      "item": "ad_astra:gravity_normalizer",
+      "text": "重力ノーマライザーは、酸素分配器に似た密閉されたエリアで人工重力を作成することを可能にします。0-Gから2-Gまでの目標重力を設定するためのスライダーがあります。重力ノーマライザーは動作するためにかなりの量の電力を使用するため、構造物が必要としない場合は避けてください。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "重力ノーマライザーのレシピ",
+      "recipe": "ad_astra:gravity_normalizer"
+    }
+  ]
+}

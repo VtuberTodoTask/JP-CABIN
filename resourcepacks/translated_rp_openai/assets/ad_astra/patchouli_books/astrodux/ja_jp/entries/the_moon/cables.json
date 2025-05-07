@@ -1,0 +1,32 @@
+{
+  "name": "ケーブル",
+  "icon": "ad_astra:desh_cable",
+  "sortnum": 6,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ケーブル",
+      "item": "ad_astra:desh_cable",
+      "text": "ケーブルは長距離エネルギー転送を可能にします。2つのバリアントがあります：スチールとデッシュ – デッシュは、より高い転送率を持っています。レンチを使用すると、ケーブルは方向を延長したり、ネットワーク内のノードから切り離したりするように設定できます。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:steel_cable",
+      "recipe2": "ad_astra:desh_cable"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:wrench"
+    },
+    {
+      "type": "patchouli:text",
+      "title": "ケーブルダクト",
+      "text": "ケーブルは固体ブロックではありません。そのため、酸素分配器や重力正規化装置の機能を妨げる構造を密閉することはありません。ケーブルダクトは、漏れを防ぎながらケーブルとまったく同じように機能する完全なブロックです。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:cable_duct"
+    }
+  ]
+}

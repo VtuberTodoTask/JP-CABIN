@@ -1,0 +1,24 @@
+{
+  "name": "鋼の製造",
+  "icon": "ad_astra:etrionic_blast_furnace",
+  "sortnum": 2,
+  "category": "ad_astra:the_first_launch",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "エトリオニックブラスト炉",
+      "item": "ad_astra:etrionic_blast_furnace",
+      "text": "エトリオニックブラスト炉は、ブラスト炉のアップグレード版です。2つのモードがあります：ブラスティングと合金化。ブラスティングはブラスト炉のように機能しますが、4つのスロットで4倍の効率を持っています。合金化は材料を組み合わせて合金を作ります。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:etrionic_blast_furnace"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "鋼",
+      "item": "ad_astra:steel_ingot",
+      "text": "鋼はエトリオニックブラスト炉で鉄と石炭を組み合わせることで作られます。これにより、鉄と石炭1つにつき1つの鋼インゴットが作られます。鋼はほとんどのレシピに不可欠であり、最初のロケットの主要な材料です。"
+    }
+  ]
+}

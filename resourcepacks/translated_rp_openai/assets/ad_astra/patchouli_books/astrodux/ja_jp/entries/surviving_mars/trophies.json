@@ -1,0 +1,20 @@
+{
+  "name": "トロフィー",
+  "icon": "ad_astra:mars_globe",
+  "sortnum": 0,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "グローブ",
+      "item": "ad_astra:earth_globe",
+      "text": "グローブはダンジョンの最後で報酬として見つかるトロフィーブロックです。グローブは実用的な機能を持たず、装飾ブロックとして使用されます。右クリックすることで回転させることができ、レッドストーンで動力を供給すると永遠に回転し続けます。現在、サバイバルで入手可能なのは月のグローブのみです。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "宇宙の絵画",
+      "item": "ad_astra:space_painting",
+      "text": "宇宙の絵画はダンジョンのチェストに見つかります。通常の絵画と同じように機能しますが、このモッドからの絵画のみを配置します。探すべき作品は14点あります。"
+    }
+  ]
+}

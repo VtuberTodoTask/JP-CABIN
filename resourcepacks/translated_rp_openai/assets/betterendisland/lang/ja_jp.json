@@ -1,7 +1,7 @@
 {
   "text.autoconfig.betterendisland-fabric-1_20.title": "YUNGのより良いエンドアイランド",
-  "text.autoconfig.betterendisland-fabric-1_20.option.general.resummonedDragonDropsEgg": "再召喚されたドラゴンが卵を落とす",
-  "text.autoconfig.betterendisland-fabric-1_20.option.general.resummonedDragonDropsEgg.@Tooltip": "エンダードラゴンが倒されるたびに卵を落とすかどうか",
-  "text.autoconfig.betterendisland-fabric-1_20.option.general.useVanillaSpawnPlatform": "バニラのオブシディアンプラットフォームを生成する",
-  "text.autoconfig.betterendisland-fabric-1_20.option.general.useVanillaSpawnPlatform.@Tooltip": "バニラのオブシディアンプラットフォームが改良されたプラットフォームの代わりにエンドに生成されるべきかどうか"
+  "text.autoconfig.betterendisland-fabric-1_20.option.general.resummonedDragonDropsEgg": "再召喚されたドラゴンが卵をドロップする",
+  "text.autoconfig.betterendisland-fabric-1_20.option.general.resummonedDragonDropsEgg.@Tooltip": "エンダードラゴンが倒されるたびに卵をドロップするかどうか",
+  "text.autoconfig.betterendisland-fabric-1_20.option.general.useVanillaSpawnPlatform": "バニラのオブシディアンプラットフォームをスポーンする",
+  "text.autoconfig.betterendisland-fabric-1_20.option.general.useVanillaSpawnPlatform.@Tooltip": "バニラのオブシディアンプラットフォームが改良されたプラットフォームの代わりにエンドにスポーンするかどうか"
 }

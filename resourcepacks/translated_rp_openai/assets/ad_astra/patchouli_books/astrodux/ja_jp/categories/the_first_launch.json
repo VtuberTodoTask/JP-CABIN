@@ -1,0 +1,6 @@
+{
+  "name": "最初の起動",
+  "description": "最初のロケットを作り、安全に月に行って帰る方法。",
+  "icon": "ad_astra:launch_pad",
+  "sortnum": 0
+}

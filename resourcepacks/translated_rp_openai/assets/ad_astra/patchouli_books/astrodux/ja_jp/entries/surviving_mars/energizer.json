@@ -1,0 +1,18 @@
+{
+  "name": "エナジャイザー",
+  "icon": "ad_astra:energizer",
+  "sortnum": 5,
+  "category": "ad_astra:surviving_mars",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "エナジャイザー",
+      "item": "ad_astra:energizer",
+      "text": "エナジャイザーはアイテムに電力を供給し、大量のエネルギーを蓄えることができる機械です。アイテムを充電するには、エナジャイザーに電力を供給し、そのアイテムでエナジャイザーを右クリックします。2百万のエネルギーを蓄えることができ、非常に長い間機械を充電することができます。また、壊れてもエネルギーを保持します。"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "ad_astra:energizer"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "ルナリアン",
+  "icon": "ad_astra:moon_stone_bricks",
+  "sortnum": 7,
+  "category": "ad_astra:the_moon",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "title": "ルナリアン",
+      "item": "ad_astra:moon_stone_bricks",
+      "text": "月全体には、大きな居住地下村があります。これらの村には、自分たちをルナリアンと呼ぶ地球の村人の異星人の形態が含まれています。地球の仲間とは異なり、ルナリアンは酸素を必要とせず、月の寒冷な環境で生き延びることができます。"
+    },
+    {
+      "type": "patchouli:entity",
+      "entity": "ad_astra:lunarian",
+      "default_rotation": 45
+    },
+    {
+      "type": "patchouli:text",
+      "text": "ルナリアンは地球の村人とは異なる取引を行い、惑星特有の材料、宇宙服、酸素装置を提供しています。"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "放浪商人",
+      "item": "ad_astra:lunarian_wandering_trader_spawn_egg",
+      "text": "ルナリアンの放浪商人は、すべての月と惑星に現れます。彼らは、発射台、酸素、燃料、ソウルトーチ、水など、あなたの命を救うかもしれない多くのロケット関連の取引を持っています。彼らは、月や惑星のさまざまな構造物で一般的に見つかるエメラルドを受け入れます。"
+    },
+    {
+      "type": "patchouli:entity",
+      "name": "放浪商人",
+      "entity": "ad_astra:lunarian_wandering_trader",
+      "default_rotation": 45,
+      "scale": 0.8
+    }
+  ]
+}
